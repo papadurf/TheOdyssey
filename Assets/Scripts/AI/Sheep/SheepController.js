@@ -19,20 +19,25 @@ var chasee : GameObject;
 var flockCenter : Vector3;
 var flockVelocity : Vector3;
 
+var bucket : Container;
+
 @HideInInspector
 var sheep : Array;
 
-function Start()
+function Awake()
 {
-	sheep = new Array(flockSize);
-	for (var i=0; i<flockSize; i++) {
+	sheep = new Array();
+	for (var i=0; i<flockSize; i++) 
+	{
 		var position = transform.position;
-		var newSheep = Instantiate(prefab, transform.position, transform.rotation);
+		var newSheep = Instantiate(prefab, transform.position, transform.rotation) as GameObject;
 		newSheep.transform.parent = transform;
 		newSheep.transform.localPosition = position;
-		var flocking : SheepFlocking = newSheep.GetComponent("SheepFlocking");
+		var flocking = newSheep.GetComponent(SheepFlocking);
+		var script = newSheep.GetComponent(Sheep);
+		script.bucket = bucket;
 		flocking.setController(gameObject);
-		sheep[i] = newSheep;
+		sheep.Add(newSheep);
 	} 
 }
 
@@ -52,7 +57,8 @@ function SetChasee(tar : GameObject)
 {
 	for (var s : GameObject in sheep)
 	{
-		var flocking : SheepFlocking = s.GetComponent("SheepFlocking");
+		var flocking : SheepFlocking = s.GetComponent(SheepFlocking);
 		flocking.chasee = tar;
 	}
 }
+

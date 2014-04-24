@@ -7,20 +7,22 @@ private var inited = false;
 private var minVelocity : float;
 private var maxVelocity : float;
 private var randomness : float;
-@HideInInspector
-var chasee : GameObject;
+
+var pause : boolean = false;
+
+@HideInInspector var chasee : GameObject;
 
 private var clumping : float;
 
 function Start () 
 {
-	StartCoroutine("sheepSteering");	
+	sheepSteering();	
 }
 
 function sheepSteering () 
 {
 	while(true) {
-		if (inited) {
+		if (inited && !rigidbody2D.isKinematic) {
 			rigidbody2D.velocity = rigidbody2D.velocity + calc() * Time.deltaTime;
 			
 			// enforce minimum and maximum speeds for the sheep
@@ -55,7 +57,7 @@ function calc ()
 }
 
 function setController (theController : GameObject) {
-		Controller = theController.GetComponent("SheepController");
+		Controller = theController.GetComponent(SheepController);
 		minVelocity = Controller.minVelocity;
 		maxVelocity = Controller.maxVelocity;
 		randomness 	= Controller.randomness;
