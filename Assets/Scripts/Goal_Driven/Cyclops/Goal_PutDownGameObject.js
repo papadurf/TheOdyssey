@@ -11,7 +11,7 @@
 
 public class Goal_PutDownGameObject extends Goal
 {
-	private var gObject : GameObject;
+	private var object : GameObject;
 	private var parent : GameObject;
 
 	/**
@@ -19,7 +19,7 @@ public class Goal_PutDownGameObject extends Goal
 	 */
 	public function Goal_PutDownGameObject(obj : GameObject, par : GameObject)
 	{
-		gObject = obj;
+		object = obj;
 		parent = par;
 	}
 	
@@ -28,38 +28,41 @@ public class Goal_PutDownGameObject extends Goal
 		status = Status.active;
 	}
 	
-	public function Terminate()
-	{
-		status = Status.completed;
-	}
-	
 	public function Process() : Status
 	{
 		ActivateIfInactive();
 	
 		// if the cyclops isnt the parent of the boulder
-		if (!gObject.transform.IsChildOf(parent.transform))
+		if (!object.transform.IsChildOf(parent.transform))
 		{
 			Debug.Log("Boulder is not a child");
 			status = Status.failed;
 		}
 		else
 		{
+			var originalScale = object.transform.localScale;
 			//opposite procedure of picking up the boulder
-			gObject.transform.localPosition = Vector3.zero;
+			object.transform.localPosition = Vector3.zero;
 			
-			var gameObjectWidth = gObject.GetComponent(BoxCollider2D).size.x;
+			var gameObjectWidth = object.GetComponent(BoxCollider2D).size.x;
 			var parentWidth = parent.GetComponent(BoxCollider2D).size.x;
-			gObject.transform.localPosition.x = gameObjectWidth/2 + parentWidth/2;
-												
-			gObject.transform.parent = null; 			//unchild the boulder
-			gObject.transform.localScale = Vector3.one; //reset scale of boulder
-			gObject.collider2D.isTrigger = false;
+			object.transform.localPosition.x = gameObjectWidth/2 + parentWidth/2;
+			
+			if (object.collider2D) object.collider2D.enabled = true;	
+			if (object.rigidbody2D) object.rigidbody2D.isKinematic = false;																									
+																																																																														
+			object.transform.parent = null; 			//unchild the boulder
+			object.transform.localScale = originalScale; //reset scale of boulder	
 			
 			Terminate();
 		}		
 			
 		return status;
+	}
+	
+	public function Terminate()
+	{
+		status = Status.completed;
 	}
 }
 

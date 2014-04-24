@@ -7,51 +7,54 @@
  *			as opposed to checking for colliding areas
  *	 3/06 - Goal changed to PickUpGameObject to create a more generic goal
  *			allowing recycling of this goal on other various objects
+ *	 3/09 - line cast method created difficulty for short objects being
+ *			being picked up and was changed back to area overlap
  */
 
 #pragma strict
 
 public class Goal_PickUpGameObject extends Goal
 {
-	private var gObject : GameObject;
+	private var object : GameObject;
 	private var parent : GameObject;
 	private var detectionPoint : Transform;
+	private var controller : CyclopsAI;
 	
 	/**
 	 *	Constructor
 	 */
 	public function Goal_PickUpGameObject(obj : GameObject, par : GameObject, det : Transform)
 	{
-		gObject = obj;
+		object = obj;
 		parent = par;
 		detectionPoint = det;
+		controller = parent.GetComponent(CyclopsAI);
 	}
 	
 	public function Process() : Status
 	{
 		ActivateIfInactive();
 		
-		var canPickUp = false; //flag for ability to pick up the game object
-		
-		//manual collision check required because the script is unattached to a gameobject		
-		var currentCollisions = Physics2D.LinecastAll(parent.transform.position, detectionPoint.position);
-		Debug.DrawLine(parent.transform.position, detectionPoint.position);
-		
-		for (var i = 0; i < currentCollisions.Length; i++) //look for boulder collider
-			if(currentCollisions[i].collider == gObject.GetComponent(BoxCollider2D))
-				canPickUp = true;
+		//flag for ability to pick up the game object
+		var canPickUp = controller.IsInFront(object);
 		
 		if(canPickUp)
 		{
-			gObject.transform.parent = parent.transform;//child game object
-			gObject.collider2D.isTrigger = true;		//make it un-collidable
+			var originalScale = object.transform.localScale;
+			var gameObjectHeight = object.GetComponent(BoxCollider2D).size.y;
 			
-			var parentHeight = parent.GetComponent(BoxCollider2D).size.y;
-			var gameObjectHeight = gObject.GetComponent(BoxCollider2D).size.y;
+			if (object.collider2D) object.collider2D.enabled = false;
+			if (object.rigidbody2D) 
+			{
+				object.rigidbody2D.isKinematic = true;
+				object.rigidbody2D.velocity = Vector2.zero;
+			}
 			
-			gObject.transform.localPosition	= Vector3.zero;
-			gObject.transform.localScale = Vector3.one;
-			gObject.transform.localPosition.y = parentHeight/2 + gameObjectHeight/2;
+			object.transform.parent = parent.transform;//child game object
+			object.transform.localPosition	= Vector3.zero;
+			object.transform.localScale = originalScale;
+			object.transform.localPosition.y = parent.GetComponent(BoxCollider2D).size.y/2 + 
+												gameObjectHeight/2;
 												
 			Terminate();
 		}

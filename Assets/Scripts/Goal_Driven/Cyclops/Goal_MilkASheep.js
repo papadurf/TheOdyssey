@@ -4,6 +4,8 @@ public class Goal_MilkASheep extends Goal
 {
 	public var sheep : GameObject;
 	public var cyclops : GameObject;
+
+	private var milkTime : int = 2;
 	
 	public function Goal_MilkASheep(cyc : GameObject, shp : GameObject)
 	{
@@ -22,8 +24,11 @@ public class Goal_MilkASheep extends Goal
 	
 		if (sheep.transform.parent === cyclops.transform)
 		{
-			sheep.SendMessage("Milk");
-			Terminate();
+			if(Time.timeSinceLevelLoad % milkTime == 0)
+			{
+				sheep.SendMessage("Milk");
+				Terminate();
+			}
 		}
 		else
 		{

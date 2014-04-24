@@ -4,13 +4,13 @@ public class Goal_MoveToPosition extends Goal
 {
 	public var bufferRange : double; 	
 	public var currentTransform : Transform;
-	public var toPosition : Vector3;
+	public var toPosition : Transform;
 	public var controller : CyclopsAI;
 		
 	private var moveDirection : Vector3;	
 		
 	// Constructor
-	public function Goal_MoveToPosition(pos : Vector3, cur : Transform, contr : CyclopsAI, r : double)
+	public function Goal_MoveToPosition(pos : Transform, cur : Transform, contr : CyclopsAI, r : double)
 	{
 		toPosition = pos;
 		currentTransform = cur;	
@@ -20,7 +20,7 @@ public class Goal_MoveToPosition extends Goal
 	
 	public function Activate()
 	{
-		moveDirection = toPosition - currentTransform.position;
+		moveDirection = toPosition.position - currentTransform.position;
 		moveDirection.z = 0;
 		moveDirection.Normalize();
 		
@@ -36,20 +36,20 @@ public class Goal_MoveToPosition extends Goal
 	{
 		ActivateIfInactive();
 		
-		if (Mathf.Abs(currentTransform.position.x - toPosition.x) < bufferRange)
+		if (Mathf.Abs(currentTransform.position.x - toPosition.position.x) < bufferRange)
 		{
 			Terminate();
 			return status;
 		}
 			 
 		var currentPosition : Vector3 = currentTransform.position;
-		moveDirection = toPosition - currentPosition;
+		moveDirection = toPosition.position - currentPosition;
 		moveDirection.z = 0;
 		moveDirection.Normalize();
 			
 		var target : Vector3 = moveDirection * controller.speed + currentPosition;
 		currentTransform.position = Vector3.Lerp(currentPosition, target, Time.deltaTime);
-		Debug.DrawLine(currentPosition, toPosition, Color.green);
+		Debug.DrawLine(currentPosition, toPosition.position, Color.green);
 		
 		return status;
 	}	 	

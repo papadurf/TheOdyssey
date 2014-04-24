@@ -2,12 +2,14 @@
 
 public class Goal_StartFire extends Goal_Composite
 {
-	public var controller : CyclopsAI;
-	public var firePit : GameObject;
+	var cyclops : GameObject;
+	var controller : CyclopsAI;
+	var firePit : GameObject;
 	
-	public function Goal_StartFire(contr : CyclopsAI, fp : GameObject)
+	public function Goal_StartFire(cyc : GameObject, fp : GameObject)
 	{
-		controller = contr;
+		cyclops = cyc;
+		controller = cyclops.GetComponent(CyclopsAI);
 		firePit = fp;
 	}
 
@@ -17,8 +19,8 @@ public class Goal_StartFire extends Goal_Composite
 		
 		AddSubgoal(new Goal_LightFire(controller, firePit));
 		
-		AddSubgoal(new Goal_MoveToPosition(firePit.transform.position, controller.thisTransform,
-											controller, controller.thisCollider.size.x/2));
+		AddSubgoal(new Goal_MoveToPosition(firePit.transform, cyclops.transform,
+											controller, cyclops.GetComponent(BoxCollider2D).size.x/2));
 		
 		status = Status.active;
 	}

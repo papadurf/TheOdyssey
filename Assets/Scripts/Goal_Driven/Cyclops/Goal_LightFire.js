@@ -1,9 +1,9 @@
+// 	Goal_LightFire is an atomic goal in which the cyclops 
+//	interacts with a firepit in the scene to activate
+//	a "Lit" state by sending a message to the game object
+
 #pragma strict
 
-/* 	This script is a atomic goal in which the cyclops 
-*	interacts with a firepit in the scene to activate
-*	a "Lit" state
-*/
 public class Goal_LightFire extends Goal
 {
 	public var controller : CyclopsAI;
@@ -27,12 +27,7 @@ public class Goal_LightFire extends Goal
 	{
 		ActivateIfInactive();
 		
-		// linecollision check extending from the direction the cyclops is looking
-		var currentCollisions = Physics2D.LinecastAll(controller.thisTransform.position,
-														controller.inFront.position);
-		for (var i = 0; i < currentCollisions.Length; i++) //look for firepit collider
-			if(currentCollisions[i].collider == firePit.GetComponent(BoxCollider2D))
-				canLight = true;
+		canLight = controller.IsInFront(firePit);
 				
 		if (canLight)
 		{
